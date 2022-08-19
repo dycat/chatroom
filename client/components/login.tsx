@@ -1,14 +1,18 @@
 export function Login(): JSX.Element {
   return (
-    <div>
-      <h1>Chatroom</h1>
-      <label>Name</label>
-      <input type="text"></input>
+    <div className="h-96 w-96 bg-slate-200 grid rounded-3xl justify-items-center">
+      <h1 className="font-sans text-4xl font-black pt-4 text-center">Chatroom</h1>
+      <div className="grid grid-flow-col gap-4">
+        <label>Name</label>
+        <input type="text" className="w-44 h-8"></input>
+      </div>
 
-      <label>Room</label>
-      <input type="text" id="" />
+      <div className="grid grid-flow-col gap-4">
+        <label>Room</label>
+        <input type="text" id="" className="w-44 h-8" />
+      </div>
 
-      <button>Login</button>
+      <button className="w-40 h-12 bg-blue-800 rounded-xl text-white text-xl font-bold">Login</button>
     </div>
   );
 }

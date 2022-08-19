@@ -11,7 +11,7 @@ const Home: NextPage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="bg-blue-600 h-screen grid items-center justify-items-center">
       <Login></Login>
     </div>
   );
