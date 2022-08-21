@@ -2,14 +2,14 @@
 
 ## requirements
 
-[] chat UI
+[x] chat UI
 
 [] authentication
 
-[] send message
+[x] send message
 
 [] display it to all user logined
 
-[] chat sever, recive messages, push to clients
+[x] chat sever, recive messages, push to clients
 
 [] can see history chat
