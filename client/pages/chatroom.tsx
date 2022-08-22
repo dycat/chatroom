@@ -15,7 +15,7 @@ export default function Chatroom(): JSX.Element {
   
   useEffect(() => {
     socket.emit("joinRoom", {user, room});
-     
+    console.log("I fire once");
     
     return () => {
       socket.off("joinRoom");
