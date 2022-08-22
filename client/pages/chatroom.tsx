@@ -14,7 +14,7 @@ export default function Chatroom(): JSX.Element {
   const {user, room} = router.query
   
   useEffect(() => {
-    socket.emit("joinRoom");
+    socket.emit("joinRoom", {user, room});
      
     
     return () => {
