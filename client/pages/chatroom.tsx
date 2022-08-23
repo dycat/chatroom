@@ -4,23 +4,41 @@ import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import { Message } from "../utils/messege";
 import { useRouter } from "next/router";
+import { User } from "../utils/users";
 
 const socket = io("http://127.0.0.1:3001");
 
 export default function Chatroom(): JSX.Element {
   const [messages, setMessages] = useState<Message[]>([]);
   const [msgInput, setMsgInput] = useState("");
-  const router = useRouter()
-  const {user, room} = router.query
-  
+  const [roomUsers, setRoomUsers] = useState<User[]>([]);
+
+  const router = useRouter();
+  const { user, room } = router.query;
+
   useEffect(() => {
-    socket.emit("joinRoom", {user, room});
+    socket.emit("joinRoom", { user, room });
     console.log("I fire once");
-    
+    socket.on("roomUsers", ({ users }) => {
+      setRoomUsers(users);
+      console.log(users)
+    });
+
     return () => {
       socket.off("joinRoom");
+      socket.off("roomUsers");
     };
   }, []);
+
+  useEffect(() => {
+    socket.on("roomUsers", ({ users }) => {
+      setRoomUsers(users);
+      console.log(users)
+    });
+    return () => {
+      socket.off("roomUsers");
+    };
+  }, [roomUsers])
 
   useEffect(() => {
     socket.on("message", ({ message, user, date }) => {
@@ -35,15 +53,14 @@ export default function Chatroom(): JSX.Element {
     return () => {
       socket.off("message");
     };
-
-  }, [messages])
+  }, [messages]);
 
   const handleInputMsg = (e) => {
     setMsgInput(e.target.value);
   };
 
   const handleSendMsg = () => {
-    socket.emit("message",  msgInput, user, room);
+    socket.emit("message", msgInput, user, room);
     setMsgInput("");
     console.log(`Message sent: ${msgInput}`);
   };
@@ -59,9 +76,12 @@ export default function Chatroom(): JSX.Element {
             <ul className="flex-grow">
               <li className="text-blue-900 font-bold pl-2">Members</li>
               <ul className="text-indigo-900 pl-4">
+                {roomUsers.map((user, index) => {
+                  return <li key={index}>{user.username}</li>;
+                })}
                 <li>John</li>
-                <li>Anne</li>
-                <li>Sam</li>
+                <li>阳</li>
+                <li>Lime</li>
               </ul>
             </ul>
             <Link href={"/"}>

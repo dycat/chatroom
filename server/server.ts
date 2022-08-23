@@ -1,3 +1,6 @@
+import { Socket } from "socket.io";
+import { User, addUser, getRoomUsers, removeUser } from "./libs/user";
+
 const express = require("express");
 const { Server } = require("socket.io");
 
@@ -19,14 +22,25 @@ const io = new Server(server, {
 const PORT = 3001;
 const HOSTNAME = "0.0.0.0";
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   //   console.log(io.of("/chatroom").adapter)
   socket.on("joinRoom", ({ user, room }) => {
     console.log(`A user joined room. socket id: ${socket.id}`);
+    let newUser: User = {
+      username: user, room: room,
+      id: socket.id
+    };
+    addUser(newUser);
 
-    socket.join(room);
+    socket.join(newUser.room);
 
     socket.emit("message", formatMsg("Welcome new friend.", "Bot"));
+
+    socket
+      .to(newUser.room)
+      .emit("roomUsers", {
+        users: getRoomUsers(newUser.room),
+      });
   });
 
   socket.on("message", (message, user, room) => {
@@ -47,7 +61,7 @@ server.listen(PORT, HOSTNAME, () => {
   console.log(`listening on port: ${PORT}`);
 });
 
-function formatMsg(message, user) {
+function formatMsg(message: string, user: string) {
   const date = new Date().toLocaleTimeString();
   return { message: message, user: user, date: date };
 }
