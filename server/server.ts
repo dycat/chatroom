@@ -1,5 +1,11 @@
 import { Socket } from "socket.io";
-import { User, addUser, getRoomUsers, removeUser } from "./libs/user";
+import {
+  User,
+  addUser,
+  getRoomUsers,
+  removeUser,
+  isUserExist,
+} from "./libs/user";
 
 const express = require("express");
 const { Server } = require("socket.io");
@@ -10,12 +16,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "*",
-      "http://127.0.0.1:3002",
-      "http://0.0.0.0:3002",
-      "http://10.0.0.9",
-    ],
+    origin: ["http://127.0.0.1:3002"],
   },
 });
 
@@ -26,21 +27,28 @@ io.on("connection", (socket: Socket) => {
   //   console.log(io.of("/chatroom").adapter)
   socket.on("joinRoom", ({ user, room }) => {
     console.log(`A user joined room. socket id: ${socket.id}`);
-    let newUser: User = {
-      username: user, room: room,
-      id: socket.id
-    };
-    addUser(newUser);
+    console.log(isUserExist(user));
 
-    socket.join(newUser.room);
+    if (isUserExist(user)) {
+    } else {
+      let newUser: User = {
+        username: user,
+        room: room,
+        id: socket.id,
+      };
+      
+      addUser(newUser);
 
-    socket.emit("message", formatMsg("Welcome new friend.", "Bot"));
+      socket.join(newUser.room);
 
-    socket
-      .to(newUser.room)
-      .emit("roomUsers", {
-        users: getRoomUsers(newUser.room),
+      socket.emit("message", formatMsg("Welcome new friend.", "Bot"));
+
+      const roomUsers = getRoomUsers(newUser.room);
+
+      io.to(newUser.room).emit("roomUsers", {
+        users: roomUsers,
       });
+    }
   });
 
   socket.on("message", (message, user, room) => {

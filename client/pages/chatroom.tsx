@@ -12,48 +12,38 @@ export default function Chatroom(): JSX.Element {
   const [messages, setMessages] = useState<Message[]>([]);
   const [msgInput, setMsgInput] = useState("");
   const [roomUsers, setRoomUsers] = useState<User[]>([]);
-
+  
   const router = useRouter();
-  const { user, room } = router.query;
-
+  const { room, user } = router.query;
+  
   useEffect(() => {
-    socket.emit("joinRoom", { user, room });
-    console.log("I fire once");
-    socket.on("roomUsers", ({ users }) => {
-      setRoomUsers(users);
-      console.log(users)
+    joinRoom();
+    socket.on("roomUsers", ( {users} ) => {
+      console.log("roomUsers")
+      setRoomUsers(prev =>  [...prev,...users]);
     });
 
-    return () => {
-      socket.off("joinRoom");
-      socket.off("roomUsers");
-    };
-  }, []);
-
-  useEffect(() => {
-    socket.on("roomUsers", ({ users }) => {
-      setRoomUsers(users);
-      console.log(users)
-    });
-    return () => {
-      socket.off("roomUsers");
-    };
-  }, [roomUsers])
-
-  useEffect(() => {
-    socket.on("message", ({ message, user, date }) => {
-      const newMessage: Message = {
-        content: message,
-        user: user,
-        time: date,
-      };
-
-      setMessages([...messages, newMessage]);
-    });
+    socket.on("message", handleMessageAppend);
+    
     return () => {
       socket.off("message");
+      socket.off("roomUsers");
     };
-  }, [messages]);
+  },[]);
+
+  const joinRoom = async () => {
+    socket.emit("joinRoom", { user, room });
+  }
+
+  const handleMessageAppend = ({ message, user, date } ) => {
+    const newMessage: Message = {
+      content: message,
+      user: user,
+      time: date,
+    };
+
+    setMessages(prev =>  [...prev, newMessage]);
+  }  
 
   const handleInputMsg = (e) => {
     setMsgInput(e.target.value);
@@ -79,9 +69,6 @@ export default function Chatroom(): JSX.Element {
                 {roomUsers.map((user, index) => {
                   return <li key={index}>{user.username}</li>;
                 })}
-                <li>John</li>
-                <li>阳</li>
-                <li>Lime</li>
               </ul>
             </ul>
             <Link href={"/"}>
