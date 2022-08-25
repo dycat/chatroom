@@ -20,7 +20,7 @@ export default function Chatroom(): JSX.Element {
     joinRoom();
     socket.on("roomUsers", ( {users} ) => {
       console.log("roomUsers")
-      setRoomUsers(prev =>  [...prev,...users]);
+      setRoomUsers([...users]);
     });
 
     socket.on("message", handleMessageAppend);
