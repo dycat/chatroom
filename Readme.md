@@ -17,3 +17,5 @@ The strict mode of next.config.js makes components render twice, so welcome mess
 [x] chat sever, recive messages, push to clients
 
 [] can see history chat
+
+[] when user leave, remove user

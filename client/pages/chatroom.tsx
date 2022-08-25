@@ -12,38 +12,38 @@ export default function Chatroom(): JSX.Element {
   const [messages, setMessages] = useState<Message[]>([]);
   const [msgInput, setMsgInput] = useState("");
   const [roomUsers, setRoomUsers] = useState<User[]>([]);
-  
+
   const router = useRouter();
   const { room, user } = router.query;
-  
+
   useEffect(() => {
     joinRoom();
-    socket.on("roomUsers", ( {users} ) => {
-      console.log("roomUsers")
+    socket.on("roomUsers", ({ users }) => {
+      console.log("roomUsers");
       setRoomUsers([...users]);
     });
 
     socket.on("message", handleMessageAppend);
-    
+
     return () => {
       socket.off("message");
       socket.off("roomUsers");
     };
-  },[]);
+  }, []);
 
   const joinRoom = async () => {
     socket.emit("joinRoom", { user, room });
-  }
+  };
 
-  const handleMessageAppend = ({ message, user, date } ) => {
+  const handleMessageAppend = ({ message, user, date }) => {
     const newMessage: Message = {
       content: message,
       user: user,
       time: date,
     };
 
-    setMessages(prev =>  [...prev, newMessage]);
-  }  
+    setMessages((prev) => [...prev, newMessage]);
+  };
 
   const handleInputMsg = (e) => {
     setMsgInput(e.target.value);
@@ -53,6 +53,10 @@ export default function Chatroom(): JSX.Element {
     socket.emit("message", msgInput, user, room);
     setMsgInput("");
     console.log(`Message sent: ${msgInput}`);
+  };
+
+  const handleLeave = () => {
+    socket.emit("leaveRoom", user);
   };
 
   return (
@@ -72,9 +76,12 @@ export default function Chatroom(): JSX.Element {
               </ul>
             </ul>
             <Link href={"/"}>
-              <p className="ml-8 mb-4 w-16 h-8 bg-red-50 text-center rounded-lg items-center text-red-600">
+              <button
+                className="ml-8 mb-4 w-16 h-8 bg-red-50 text-center rounded-lg items-center text-red-600"
+                onClick={handleLeave}
+              >
                 Back
-              </p>
+              </button>
             </Link>
           </div>
           <div className="w-5/6 flex flex-col">

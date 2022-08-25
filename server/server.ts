@@ -36,7 +36,7 @@ io.on("connection", (socket: Socket) => {
         room: room,
         id: socket.id,
       };
-      
+
       addUser(newUser);
 
       socket.join(newUser.room);
@@ -59,6 +59,10 @@ io.on("connection", (socket: Socket) => {
     // broadcast to other users in the room
     socket.broadcast.to(room).emit("message", formattedMsg);
   });
+
+  socket.on("leaveRoom", (user) => {
+    console.log(`${user} leave room`)
+  })
 
   socket.on("disconnect", () => {
     console.log(`A user disconnected. socket id: ${socket.id}`);
